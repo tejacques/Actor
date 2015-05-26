@@ -26,6 +26,8 @@ namespace Utility
         int cursorY;
         int boardX;
         int boardY;
+        int activeSelection;
+        int passiveSelection;
 
         long mouseXPtr;
         long mouseYPtr;
@@ -34,6 +36,7 @@ namespace Utility
         long cursorCoordsPtr;
         long menuRulesPtr;
         long boardRulesPtr;
+        long menuSelectionPtr;
         long targetPtr;
 
 
@@ -51,9 +54,9 @@ namespace Utility
 
         public static readonly List<Point> BoardOffsets = new List<Point>
         {
-            new Point(442, 144), new Point(570, 144), new Point(714, 144),
-            new Point(442, 280), new Point(570, 280), new Point(714, 280),
-            new Point(442, 416), new Point(570, 416), new Point(714, 416),
+            new Point(442, 144), new Point(578, 144), new Point(714, 144),
+            new Point(442, 280), new Point(578, 280), new Point(714, 280),
+            new Point(442, 416), new Point(578, 416), new Point(714, 416),
         };
 
         public GameScanner()
@@ -87,6 +90,8 @@ namespace Utility
 
             //Console.WriteLine("Getting Pointer for: Board Rules");
             this.boardRulesPtr = this.memoryReader.Pointer(Offsets.BoardRules);
+
+            this.menuSelectionPtr = this.memoryReader.Pointer(Offsets.MenuSelection);
         }
 
         public void RefreshBoardState()
@@ -128,12 +133,26 @@ namespace Utility
             this.cursorY = this.memoryReader.ReadInt16(this.cursorCoordsPtr + Offsets.CursorY);
         }
 
+        public void RefreshMenuState()
+        {
+            if (0 == this.menuSelectionPtr)
+            {
+                this.activeSelection = -1;
+                this.passiveSelection = -1;
+                return;
+            }
+
+            this.activeSelection = this.memoryReader.ReadInt16(this.menuSelectionPtr + Offsets.ActiveSelection);
+            this.passiveSelection = this.memoryReader.ReadInt16(this.menuSelectionPtr + Offsets.PassiveSelection);
+        }
+
         public void Refresh()
         {
             RefreshPointers();
             RefreshMouseState();
             RefreshCursorState();
             RefreshBoardState();
+            RefreshMenuState();
         }
 
         public static int CreatePlayerPortion(int playerId)
@@ -272,6 +291,21 @@ namespace Utility
         public bool BoardOpen()
         {
             return (BoardX() > 0 && BoardY() > 0);
+        }
+
+        public bool MenuOpen()
+        {
+            return this.activeSelection > 0 && this.activeSelection < 0xFF;
+        }
+
+        public int ActiveMenuSelection()
+        {
+            return this.activeSelection;
+        }
+
+        public int PassiveMenuSelection()
+        {
+            return this.passiveSelection;
         }
 
     }

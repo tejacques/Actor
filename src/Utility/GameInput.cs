@@ -26,7 +26,7 @@ namespace Utility
             return WindowHook.SendKeystroke(this._process.MainWindowHandle, (ushort)key);
         }
 
-        public bool StartGame()
+        public bool StartGame(int deck)
         {
             this._gs.Refresh();
 
@@ -36,7 +36,77 @@ namespace Utility
                 return false;
             }
 
+            // Target Person
+            Console.WriteLine("Hitting 0 to target nearest thing");
             HitConfirm();
+            Thread.Sleep(400);
+
+            // Interact
+            Console.WriteLine("Hitting 0 to interact");
+            HitConfirm();
+
+            this._gs.Refresh();
+            while(this._gs.ActiveMenuSelection() != 0)
+            {
+                Thread.Sleep(50);
+                this._gs.Refresh();
+            }
+
+            // Select First thing (Triple Triad Match)
+            Console.WriteLine("Hitting 0 to select play Triple Triad");
+            HitConfirm();
+            Thread.Sleep(700);
+
+            Console.WriteLine("Hitting 0 to select Advance Chat Menu");
+            // Talk Menu
+            HitConfirm();
+            Thread.Sleep(1600);
+
+
+            // Register For Match
+            RegisterForMatch(deck);
+
+
+            return true;
+        }
+
+        public bool RegisterForMatch(int deck)
+        {
+            // Accept Match
+            Console.WriteLine("Hitting 0 to accept match");
+            HitConfirm();
+            Thread.Sleep(1000);
+
+            // Select Deck
+            SelectDeck(deck);
+
+            return true;
+        }
+
+        private bool SelectDeck(int deck)
+        {
+            for(int i = 0; i < deck; i++)
+            {
+                Console.WriteLine("Hitting down");
+                MoveDown();
+                Thread.Sleep(80);
+            }
+
+            Console.WriteLine("Hitting 0 to confirm deck");
+            HitConfirm();
+            Thread.Sleep(2000);
+
+            return true;
+        }
+
+        public bool Rematch(int deck)
+        {
+            HitConfirm();
+            Thread.Sleep(500);
+
+            RegisterForMatch(deck);
+
+            return true;
         }
 
         public bool PlayCard(int handIndex, int boardIndex)
@@ -124,7 +194,6 @@ namespace Utility
             while (targetOffset.X != this._gs.GetBoardOffsetX()
                 || targetOffset.Y != this._gs.GetBoardOffsetY())
             {
-
                 if (!this._gs.BoardOpen())
                 {
                     return false;
@@ -141,6 +210,9 @@ namespace Utility
                 var xDelta = targetOffset.X - x;
                 var yDelta = targetOffset.Y - y;
 
+                Console.WriteLine("Target: X=" + targetOffset.X + ", Y=" + targetOffset.Y);
+                Console.WriteLine("Current: X=" + x + ", Y=" + y);
+                Console.WriteLine("Delta: X=" + xDelta + ", Y=" + yDelta + "\n");
 
                 // Move the one that's further away closer
                 if (Math.Abs(xDelta) > Math.Abs(yDelta))

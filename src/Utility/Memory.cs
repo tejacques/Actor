@@ -63,6 +63,17 @@ namespace Utility
             0x0,
         };
 
+        public static readonly int[] MenuSelection = new[] {
+            0x00FB02F0,
+            0x8,
+            0xB8,
+            0x1B0,
+            0xC0,
+        };
+
+        public const int ActiveSelection = 0x0;
+        public const int PassiveSelection = 0x2;
+
         public enum BoardOffsets
         {
             Player0Hand = 0x0,

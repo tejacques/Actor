@@ -43,8 +43,9 @@ namespace ConsoleTest
             }
 
             var gi = new GameInput();
-            Console.WriteLine(gi.PlayCard(4, 3));
             gs.Refresh();
+            //gi.StartGame(4);
+            Console.WriteLine(gi.PlayCard(0, 7));
             Console.WriteLine("Board offset X: " + gs.GetBoardOffsetX());
             Console.WriteLine("Board offset Y: " + gs.GetBoardOffsetY());
             //Console.ReadLine();
