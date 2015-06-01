@@ -28,6 +28,8 @@ namespace Utility
         int boardY;
         int activeSelection;
         int passiveSelection;
+        byte[] menuRules;
+        byte[] boardRules;
 
         long mouseXPtr;
         long mouseYPtr;
@@ -111,6 +113,23 @@ namespace Utility
             {
                 this.boardX = this.memoryReader.ReadInt16(this.boardCoordsPtr + Offsets.BoardX);
                 this.boardY = this.memoryReader.ReadInt16(this.boardCoordsPtr + Offsets.BoardY);
+            }
+
+            if (0 == this.menuRulesPtr)
+            {
+                this.menuRules = null;
+            }
+            else
+            {
+                this.menuRules = this.memoryReader.Read(this.menuRulesPtr, 4, out bytesRead);
+            }
+            if (0 == this.boardRulesPtr)
+            {
+                this.boardRules = null;
+            }
+            else
+            {
+                this.boardRules = this.memoryReader.Read(this.boardRulesPtr, 4, out bytesRead);
             }
         }
 
@@ -306,6 +325,34 @@ namespace Utility
         public int PassiveMenuSelection()
         {
             return this.passiveSelection;
+        }
+
+        private int GetRules(byte[] rules)
+        {
+            var res = 0;
+
+            if (null != rules)
+            {
+                for (var i = 0; i < rules.Length; i++)
+                {
+                    if (rules[i] > 0)
+                    {
+                        res |= 1 << rules[i];
+                    }
+                }
+            }
+
+            return res;
+        }
+
+        public int GetMenuRules()
+        {
+            return GetRules(this.menuRules);
+        }
+
+        public int GetBoardRules()
+        {
+            return GetRules(this.boardRules);
         }
 
     }

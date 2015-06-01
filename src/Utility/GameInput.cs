@@ -14,6 +14,14 @@ namespace Utility
         private Process _process;
         private GameScanner _gs;
 
+        public GameScanner GameScanner
+        {
+            get
+            {
+                return this._gs;
+            }
+        }
+
         public GameInput()
         {
             this._gs = new GameScanner();

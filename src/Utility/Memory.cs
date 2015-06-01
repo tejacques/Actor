@@ -262,7 +262,7 @@ namespace Utility
             catch (System.ComponentModel.Win32Exception e)
             {
                 bytesRead = 0;
-                Console.WriteLine("Error encountered during read: {0}", e.Message);
+                //Console.WriteLine("Error encountered during read: {0}", e.Message);
             }
 
             return buffer;

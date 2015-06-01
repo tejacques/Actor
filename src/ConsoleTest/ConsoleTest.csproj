@@ -47,13 +47,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Utility\Utility.csproj">
+    <ProjectReference Include="..\Utility\Utility.csproj">
       <Project>{3cd7ad0d-528f-4349-821e-74cf517acc1e}</Project>
       <Name>Utility</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Actor.csproj">
-      <Project>{a455cc78-9ce4-4fea-b2e6-835f83933add}</Project>
-      <Name>Actor</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
