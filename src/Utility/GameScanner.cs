@@ -214,7 +214,9 @@ namespace Utility
             for (var i = 0; i < hand.Length; i++)
             {
                 var cur = boardOffset * i;
-                hand[i] = playerIdPortion | this.boardBytes[offset + cardIdOffset + cur];
+                var cardId = this.boardBytes[offset + cardIdOffset + cur];
+                //hand[i] = playerIdPortion | cardId;
+                hand[i] = cardId;
             }
 
             return hand;
@@ -275,7 +277,7 @@ namespace Utility
 
         public int GetTurnPlayerId()
         {
-            if (0 == GetTimer())
+            if (!BoardOpen())
             {
                 return -1;
             }

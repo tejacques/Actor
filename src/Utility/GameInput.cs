@@ -110,7 +110,7 @@ namespace Utility
         public bool Rematch(int deck)
         {
             HitConfirm();
-            Thread.Sleep(500);
+            Thread.Sleep(1000);
 
             RegisterForMatch(deck);
 
@@ -197,7 +197,7 @@ namespace Utility
 
         private bool MoveToBoardPosition(Point targetOffset)
         {
-            Console.WriteLine("Target: X=" + targetOffset.X + ", Y=" + targetOffset.Y);
+            //Console.WriteLine("Target: X=" + targetOffset.X + ", Y=" + targetOffset.Y);
             this._gs.Refresh();
             while (targetOffset.X != this._gs.GetBoardOffsetX()
                 || targetOffset.Y != this._gs.GetBoardOffsetY())
@@ -218,9 +218,9 @@ namespace Utility
                 var xDelta = targetOffset.X - x;
                 var yDelta = targetOffset.Y - y;
 
-                Console.WriteLine("Target: X=" + targetOffset.X + ", Y=" + targetOffset.Y);
-                Console.WriteLine("Current: X=" + x + ", Y=" + y);
-                Console.WriteLine("Delta: X=" + xDelta + ", Y=" + yDelta + "\n");
+                //Console.WriteLine("Target: X=" + targetOffset.X + ", Y=" + targetOffset.Y);
+                //Console.WriteLine("Current: X=" + x + ", Y=" + y);
+                //Console.WriteLine("Delta: X=" + xDelta + ", Y=" + yDelta + "\n");
 
                 // Move the one that's further away closer
                 if (Math.Abs(xDelta) > Math.Abs(yDelta))
@@ -250,8 +250,8 @@ namespace Utility
                 this._gs.Refresh();
             }
 
-            Console.WriteLine("Current: X=" + this._gs.GetBoardOffsetX()
-                + ", Y=" + this._gs.GetBoardOffsetY());
+            //Console.WriteLine("Current: X=" + this._gs.GetBoardOffsetX()
+            //    + ", Y=" + this._gs.GetBoardOffsetY());
 
             return true;
         }

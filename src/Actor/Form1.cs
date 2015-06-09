@@ -108,6 +108,8 @@ namespace Actor
             player1Hand = new int[5];
             board = new int[9];
             rules = 0;
+
+            DeckChoice.SelectedIndex = deckChoice;
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -149,6 +151,18 @@ namespace Actor
         int[] player1Hand;
         int[] board;
         int rules;
+        int turn;
+        int turnPlayerId = -1;
+
+        public static readonly List<int> DeckChoices = new List<int>
+        {
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+        };
 
         void updateTimer_Tick(object sender, EventArgs e)
         {
@@ -157,6 +171,8 @@ namespace Actor
 
             if (!gs.BoardOpen())
             {
+                this.turn = -1;
+                this.turnPlayerId = -1;
                 return;
             }
 
@@ -164,25 +180,51 @@ namespace Actor
             var p1Hand = gs.PlayerHand(1);
             var board = gs.Board();
             var rules = gs.GetBoardRules();
+            var turnPlayerId = gs.GetTurnPlayerId();
+            var turnNum = board.Count(x => x != 255);
 
-            if (!boardChanged(p0Hand, p1Hand, board, rules))
+            if (turnNum < 9
+                && turnPlayerId != this.turnPlayerId)
+            {
+                if (turnPlayerId == 0)
+                {
+                    //PlayNextTurn();
+                    Console.WriteLine("Would play card here");
+                }
+            }
+            if (!boardChanged(p0Hand, p1Hand, board, rules, turnNum))
             {
                 return;
             }
+            
+
+            Console.WriteLine("\n\nTurn and Board Changed ----");
 
             this.player0Hand = p0Hand;
             this.player1Hand = p1Hand;
             this.board = board;
             this.rules = rules;
-            var turnPlayerId = gs.GetTurnPlayerId();
+            this.turnPlayerId = turnPlayerId;
 
+            Console.WriteLine("TurnPlayerId: " + turnPlayerId);
             updateJavaScript(p0Hand, p1Hand, board, rules, turnPlayerId);
+            turn = turnNum;
 
+            if (turn == 9)
+            {
+                turnPlayerId = -1;
+            }
 
         }
 
-        public bool boardChanged(int[] p0, int[] p1, int[] b, int rules)
+        public bool boardChanged(
+            int[] p0,
+            int[] p1,
+            int[] b,
+            int rules,
+            int turnNum)
         {
+            if (turnNum != this.turn) return true;
             if (p0.Length != player0Hand.Length) return true;
             if (p1.Length != player1Hand.Length) return true;
             if (b.Length != board.Length) return true;
@@ -215,24 +257,29 @@ namespace Actor
             int rules,
             int currentPlayerTurn)
         {
-            string fmt = @"
-var game = board.state.game.clone();
-game.parent = board.state.game;
-var h0={0};
-var h1={1};
+            const string fmt = @"
+(function(h0, h1, gameBoard, rules, turn, firstMove) {{
+var parent = board.state.game;
+if (turn === 0) {{
+    while(parent.parent) parent = parent.parent;
+}}
+var game = parent.clone();
 var ph0 = game.players[0].hand;
 var ph1 = game.players[1].hand;
 ph0.forEach(function(card, index, hand) {{
-    hand[index] = Math.max(hand[index], h0[index]);
+    hand[index] = h0[index] > 0 ? h0[index] : hand[index];
 }});
 ph1.forEach(function(card, index, hand) {{
-    hand[index] = Math.max(hand[index], h1[index]);
+    hand[index] = h1[index] > 0 ? h1[index] : hand[index];
 }});
-game.board={2};
-game.rules={3};
-game.turn={4};
-game.firstMove={5};
+game.board=gameBoard;
+game.rules=rules;
+game.turn=turn;
+game.firstMove=firstMove;
+game = game.clone();
+game.parent = parent;
 board.setState({{ game: game }});
+}})({0}, {1}, {2}, {3}, {4}, {5});
 ";
             var p0s = JsonConvert.SerializeObject(p0);
             var p1s = JsonConvert.SerializeObject(p1);
@@ -241,6 +288,7 @@ board.setState({{ game: game }});
             var turnNum = board.Count(x => x != 255);
             var turn = JsonConvert.SerializeObject(turnNum);
 
+            Console.WriteLine("Updating JavaScript with current board");
             Console.WriteLine("Turn: " + turn + " CurrentPlayerTurn: " + currentPlayerTurn);
             var firstMove = (turnNum % 2) == currentPlayerTurn ? 1 : 0;
             var firstMoveStr = JsonConvert.SerializeObject(firstMove);
@@ -256,9 +304,42 @@ board.setState({{ game: game }});
             webBrowser1.Document.InvokeScript("eval", new[] { toRun });
         }
 
+        private void PlayNextTurn()
+        {
+            dynamic move = webBrowser1.Document.InvokeScript("getNextMove", new object[] { 5000 });
+
+            int handIndex = move.handIndex;
+            int boardIndex = move.boardIndex;
+
+            Console.WriteLine("Playing: " + handIndex + " at " + boardIndex);
+            gameInput.PlayCard(handIndex, boardIndex);
+        }
+
         private void Stop()
         {
             updateTimer.Stop();
         }
+
+        private void PlayMove_Click(object sender, EventArgs e)
+        {
+            PlayNextTurn();
+        }
+
+        private int deckChoice = 0;
+        private void DeckChoice_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            deckChoice = DeckChoice.SelectedIndex;
+        }
+
+        private void StartGameButton_Click(object sender, EventArgs e)
+        {
+            gameInput.StartGame(deckChoice);
+        }
+
+        private void RematchButton_Click(object sender, EventArgs e)
+        {
+            gameInput.Rematch(deckChoice);
+        }
+
     }
 }
